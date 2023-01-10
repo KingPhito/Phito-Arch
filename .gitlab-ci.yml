@@ -1,5 +1,18 @@
+image: jangrewe/gitlab-ci-android
+
+stages:
+  - deploy
+
+before_script:
+  - export GRADLE_USER_HOME=$(pwd)/.gradle
+  - chmod +x ./gradlew
+
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+    - .gradle/
+
 deploy:
-  image: gradle:6.5-jdk11
   script:
     - 'gradle publish'
   only:
