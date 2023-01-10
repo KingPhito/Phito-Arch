@@ -13,6 +13,7 @@ cache:
     - .gradle/
 
 deploy:
+  stage: deploy
   script:
     - 'gradle publish'
   only:
