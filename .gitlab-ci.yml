@@ -15,6 +15,6 @@ cache:
 deploy:
   stage: deploy
   script:
-    - 'gradle publish'
+    - './gradlew publish'
   only:
     - main
