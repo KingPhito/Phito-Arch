@@ -76,7 +76,7 @@ android {
 
 apollo {
     service("service") {
-        packageName.set("com.ralphdugue.phitoarch.grahql")
+        packageName.set("com.ralphdugue.phitoarch.graphql")
     }
 }
 
