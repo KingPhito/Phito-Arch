@@ -1,6 +1,7 @@
 type Query {
     empty(id: ID): Empty
 }
+
 type Empty {
     id: ID
 }
