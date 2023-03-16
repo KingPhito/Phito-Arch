@@ -1,5 +1,6 @@
 package com.ralphdugue.phitoarch.mvi
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.flow.Flow
@@ -11,26 +12,26 @@ interface ViewState {
 
 interface BaseIntent
 
-interface BaseIntentHandler<T : BaseIntent> {
+interface BaseIntentHandler<T : BaseIntent, R : ViewState> {
 
-    fun process(event: T, currentState: ViewState): Flow<ViewState>
+    fun process(event: T, currentState: ViewState): Flow<R>
 }
 
 
-interface StatefulModel {
-    val state: State<ViewState>
+interface StatefulModel<T: ViewState> {
+    val state: State<T>
 }
 
-class StateMutator(initialState: ViewState) {
+class StateMutator<T : ViewState>(initialState: T) {
 
-    private val _observable = mutableStateOf(initialState)
-    val observable: State<ViewState> = _observable
+    private val _observable: MutableState<T> = mutableStateOf(initialState)
+    val observable: State<T> = _observable
 
     init {
         _observable.value = initialState
     }
 
-    fun updateState(newState: (currentState: ViewState) -> ViewState) =
+    fun updateState(newState: (currentState: T) -> T) =
         synchronized(observable.value) {
             _observable.value = newState(observable.value)
         }
