@@ -6,10 +6,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 
-abstract class BaseViewModel<T : BaseIntent>(
-    private val eventHandler: BaseIntentHandler<T>,
+abstract class BaseViewModel<T : BaseIntent, R : ViewState>(
+    private val eventHandler: BaseIntentHandler<T, R>,
     private val ioDispatcher: CoroutineDispatcher
-)   : ViewModel(), StatefulModel {
+)   : ViewModel(), StatefulModel<R> {
 
     private val stateMutator by lazy { StateMutator(initialState()) }
     override val state = stateMutator.observable
@@ -31,9 +31,11 @@ abstract class BaseViewModel<T : BaseIntent>(
             .launchIn(viewModelScope)
     }
 
-    abstract fun initialState(): ViewState
+    abstract fun initialState(): R
 
     private fun errorState(throwable: Throwable) = ViewState.Error(throwable.toString())
 
-    private fun emitState(state: ViewState) = stateMutator.updateState { state }
+    private fun emitState(state: R) = stateMutator.updateState { state }
+
+
 }
