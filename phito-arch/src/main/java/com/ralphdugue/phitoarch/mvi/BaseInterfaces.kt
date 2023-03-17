@@ -14,7 +14,7 @@ interface BaseIntent
 
 interface BaseIntentHandler<T : BaseIntent, R : ViewState> {
 
-    fun process(event: T, currentState: ViewState): Flow<R>
+    fun process(event: T, currentState: R): Flow<R>
 }
 
 
