@@ -33,7 +33,9 @@ abstract class BaseViewModel<T : BaseIntent, R : ViewState>(
 
     abstract fun initialState(): R
 
-    private fun errorState(throwable: Throwable) = ViewState.Error(throwable.toString())
+    private fun errorState(throwable: Throwable) {
+        stateMutator.updateState { it.copy(error = throwable) }
+    }
 
     private fun emitState(state: R) = stateMutator.updateState { state }
 
