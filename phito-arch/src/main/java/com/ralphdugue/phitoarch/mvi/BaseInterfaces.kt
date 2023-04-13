@@ -5,9 +5,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.flow.Flow
 
-interface ViewState {
-
-    data class Error(val message: String) : ViewState
+sealed class ViewState(val error: Throwable? = null) {
+    abstract fun <R: ViewState> copy(
+        error: Throwable? = null,
+        vararg fields: Any
+    ): R
 }
 
 interface BaseIntent
