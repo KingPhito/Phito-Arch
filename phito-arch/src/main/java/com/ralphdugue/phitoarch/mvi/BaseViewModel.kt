@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 
-abstract class BaseViewModel<T : BaseIntent, R : ViewState>(
+abstract class BaseViewModel<T : BaseIntent, R : BaseViewState>(
     private val eventHandler: BaseIntentHandler<T, R>,
     private val ioDispatcher: CoroutineDispatcher
 )   : ViewModel(), StatefulModel<R> {
@@ -33,9 +33,7 @@ abstract class BaseViewModel<T : BaseIntent, R : ViewState>(
 
     abstract fun initialState(): R
 
-    private fun errorState(throwable: Throwable) {
-        stateMutator.updateState { it.copy(error = throwable) }
-    }
+    abstract fun errorState(throwable: Throwable)
 
     private fun emitState(state: R) = stateMutator.updateState { state }
 
