@@ -5,26 +5,21 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.flow.Flow
 
-sealed class ViewState(val error: Throwable? = null) {
-    abstract fun <R: ViewState> copy(
-        error: Throwable? = null,
-        vararg fields: Any
-    ): R
-}
+interface BaseViewState
 
 interface BaseIntent
 
-interface BaseIntentHandler<T : BaseIntent, R : ViewState> {
+interface BaseIntentHandler<T : BaseIntent, R : BaseViewState> {
 
     fun process(event: T, currentState: R): Flow<R>
 }
 
 
-interface StatefulModel<T: ViewState> {
+interface StatefulModel<T: BaseViewState> {
     val state: State<T>
 }
 
-class StateMutator<T : ViewState>(initialState: T) {
+class StateMutator<T : BaseViewState>(initialState: T) {
 
     private val _observable: MutableState<T> = mutableStateOf(initialState)
     val observable: State<T> = _observable
