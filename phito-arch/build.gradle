@@ -10,7 +10,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'com.ralphdugue'
             artifactId = 'phito-arch'
-            version = '0.2.1'
+            version = '0.3.0'
 
             afterEvaluate {
                 from components.release
