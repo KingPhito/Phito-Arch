@@ -19,7 +19,7 @@ abstract class BaseViewModel<T : BaseIntent, R : BaseViewState>(
     var state by mutableStateOf(initialState())
         private set
 
-    private fun onEvent(event: T) {
+    fun onEvent(event: T) {
         eventHandler.process(event, state)
             .onEach(::emitState)
             .catch { errorState(it) }
