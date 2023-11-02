@@ -3,45 +3,63 @@ package com.ralphdugue.phitoarch.mvi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<T : BaseIntent, R : BaseViewState>(
-    private val eventHandler: BaseIntentHandler<T, R>,
+abstract class BaseViewModel<Event : BaseEvent, State : BaseViewState, Effect : BaseEffect>(
     private val ioDispatcher: CoroutineDispatcher
-)   : ViewModel() {
+)  : ViewModel() {
 
-    private val _state = MutableStateFlow(initialState())
-    val state: StateFlow<R> = _state.stateIn(
+    private val initialState: State by lazy { createInitialState() }
+    private val _state = MutableStateFlow(initialState)
+    val state: StateFlow<State> = _state.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
         _state.value
     )
 
-    fun onEvent(event: T) {
-        eventHandler.process(event, state.value)
-            .onEach(::emitState)
-            .catch { errorState(it) }
+    private val _events = MutableSharedFlow<Event>()
+    val events = _events.asSharedFlow()
+
+    private val _effect : Channel<Effect> = Channel()
+    val effect = _effect.receiveAsFlow()
+
+    init {
+        subscribeToEvents()
+    }
+
+    fun onEvent(event: Event) {
+        viewModelScope.launch { _events.emit(event) }
+    }
+
+    private fun subscribeToEvents() {
+        events
+            .onEach { event -> updateState { handleEvent(event) } }
+            .catch { setEffect(createEffect(it)) }
             .flowOn(ioDispatcher)
             .launchIn(viewModelScope)
     }
 
-    abstract fun initialState(): R
+    abstract fun createInitialState(): State
 
-    abstract fun errorState(throwable: Throwable)
+    abstract fun handleEvent(event: Event): State
 
-    private fun emitState(state: R) = updateState { state }
+    abstract fun createEffect(throwable: Throwable): Effect
 
-    private fun updateState(newState: (currentState: R) -> R) =
-        synchronized(_state) {
-            _state.value = newState(state.value)
-        }
+    private fun updateState(newState: (currentState: State) -> State) =
+        synchronized(_state) { _state.update { newState(it) } }
 
+    private suspend fun setEffect(effect: Effect) {  _effect.send(effect) }
 }
