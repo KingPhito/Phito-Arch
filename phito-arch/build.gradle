@@ -10,7 +10,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'com.ralphdugue'
             artifactId = 'phito-arch'
-            version = '0.4.0'
+            version = '0.4.1'
 
             afterEvaluate {
                 from components.release
@@ -40,7 +40,7 @@ android {
         minSdk 23
         targetSdk 34
         versionCode 1
-        versionName "1.2"
+        versionName "4.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

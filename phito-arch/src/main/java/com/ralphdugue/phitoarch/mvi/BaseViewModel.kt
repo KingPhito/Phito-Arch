@@ -52,14 +52,16 @@ abstract class BaseViewModel<Event : BaseEvent, State : BaseViewState, Effect : 
             .launchIn(viewModelScope)
     }
 
-    abstract fun createInitialState(): State
+    protected abstract fun createInitialState(): State
 
-    abstract fun handleEvent(event: Event): State
+    protected abstract suspend fun handleEvent(event: Event): State
 
-    abstract fun createEffect(throwable: Throwable): Effect
+    protected abstract fun createEffect(throwable: Throwable): Effect
 
-    private fun updateState(newState: (currentState: State) -> State) =
-        synchronized(_state) { _state.update { newState(it) } }
+    private fun updateState(newState: suspend (currentState: State) -> State) =
+        synchronized(_state) {
+            viewModelScope.launch { _state.update { newState(it) } }
+        }
 
     private suspend fun setEffect(effect: Effect) {  _effect.send(effect) }
 }
