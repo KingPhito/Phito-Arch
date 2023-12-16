@@ -19,14 +19,11 @@ publishing {
     }
     repositories {
         maven {
-            url "${System.getenv("CI_API_V4_URL")}/projects/42441938/packages/maven"
-            name "GitLab"
-            credentials(HttpHeaderCredentials) {
-                name = "Job-Token"
-                value = System.getenv("CI_JOB_TOKEN")
-            }
-            authentication {
-                header(HttpHeaderAuthentication)
+            name = 'GitHubPackages'
+            url = uri('https://maven.pkg.github.com/ralphdugue/Phito-Arch')
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }
@@ -39,8 +36,6 @@ android {
     defaultConfig {
         minSdk 23
         targetSdk 34
-        versionCode 1
-        versionName "4.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
