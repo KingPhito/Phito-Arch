@@ -20,9 +20,9 @@ publishing {
     repositories {
         maven {
             name = 'GitHubPackages'
-            url = uri('https://maven.pkg.github.com/ralphdugue/Phito-Arch')
+            url = uri('https://maven.pkg.github.com/rdugue/Phito-Arch')
             credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
             }
         }
